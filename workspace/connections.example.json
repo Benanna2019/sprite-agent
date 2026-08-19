@@ -1,0 +1,9 @@
+{
+  "userId": "REPLACE_WITH_COMPOSIO_ENTITY_ID",
+  "toolkits": {
+    "gmail": "ca_REPLACE",
+    "zernio_mcp": "ca_REPLACE",
+    "whatsapp": "ca_REPLACE",
+    "outlook": "ca_REPLACE"
+  }
+}

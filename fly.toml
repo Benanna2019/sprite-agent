@@ -1,0 +1,28 @@
+# Fly Sprite config. Sleeps when idle, wakes on inbound HTTP, keeps a durable
+# disk for the workspace. Rename `app` before `fly launch`.
+app = "shaun-scribe-agent"
+primary_region = "iad"
+
+[build]
+
+[http_service]
+  internal_port = 3939
+  force_https = true
+  # This is the sleep/wake behavior the spec depends on.
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+# Durable disk. Agent-written functions and memory live here across restarts.
+[[mounts]]
+  source = "workspace_data"
+  destination = "/app/workspace"
+
+# Secrets are NOT set here. Use:
+#   fly secrets set OPENAI_API_KEY=... INNGEST_EVENT_KEY=... INNGEST_SIGNING_KEY=...
+[env]
+  PORT = "3939"

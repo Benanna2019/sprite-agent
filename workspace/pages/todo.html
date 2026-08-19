@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Focused Work</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-start justify-center p-6">
+  <div class="w-full max-w-md mt-16">
+    <h1 class="text-2xl font-semibold mb-1">Focused Work</h1>
+    <p class="text-slate-400 text-sm mb-6">Check one off and it fires a durable event on the Sprite.</p>
+
+    <div class="flex gap-2 mb-4">
+      <input id="new" type="text" placeholder="Add a task"
+        class="flex-1 bg-slate-800 rounded px-3 py-2 outline-none placeholder:text-slate-500" />
+      <button id="add" class="bg-indigo-600 hover:bg-indigo-500 rounded px-4 py-2 font-medium">Add</button>
+    </div>
+
+    <ul id="list" class="space-y-2"></ul>
+
+    <p id="status" class="text-xs text-slate-500 mt-6 h-4"></p>
+  </div>
+
+  <script>
+    const list = document.getElementById("list");
+    const status = document.getElementById("status");
+    const seed = ["Draft the client proposal", "Ship the A/B function", "Reply to Rich"];
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "null") || seed.map((t, i) => ({ id: "t" + i, text: t, done: false }));
+
+    function save() { localStorage.setItem("tasks", JSON.stringify(tasks)); }
+
+    async function fire(task) {
+      status.textContent = "sending event...";
+      try {
+        const res = await fetch("/api/event", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: "todo/item.done", data: { id: task.id, text: task.text } }),
+        });
+        const j = await res.json();
+        status.textContent = j.ok ? "fired todo/item.done (" + (j.ids?.[0] || "") + ")" : "error: " + (j.error || "");
+      } catch (e) { status.textContent = "error: " + e.message; }
+    }
+
+    function render() {
+      list.innerHTML = "";
+      for (const task of tasks) {
+        const li = document.createElement("li");
+        li.className = "flex items-center gap-3 bg-slate-800 rounded px-3 py-2";
+        const cb = document.createElement("input");
+        cb.type = "checkbox"; cb.checked = task.done; cb.className = "w-4 h-4 accent-indigo-500";
+        cb.onchange = () => { task.done = cb.checked; save(); render(); if (cb.checked) fire(task); };
+        const span = document.createElement("span");
+        span.textContent = task.text;
+        span.className = "flex-1" + (task.done ? " line-through text-slate-500" : "");
+        li.append(cb, span);
+        list.append(li);
+      }
+    }
+
+    document.getElementById("add").onclick = () => {
+      const v = document.getElementById("new").value.trim();
+      if (!v) return;
+      tasks.push({ id: "t" + Date.now(), text: v, done: false });
+      document.getElementById("new").value = ""; save(); render();
+    };
+
+    render();
+  </script>
+</body>
+</html>

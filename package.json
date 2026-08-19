@@ -1,0 +1,24 @@
+{
+  "name": "shaun-scribe-agent",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Serve-mode Inngest + Utah-pattern harness. Phase 0: local durable ping.",
+  "scripts": {
+    "start": "node src/server.js",
+    "serve": "node src/server.js",
+    "serve:dev": "INNGEST_DEV=1 node src/server.js",
+    "send": "INNGEST_DEV=1 node scripts/send-ping.mjs",
+    "inngest:dev": "npx --yes inngest-cli@latest dev -u http://localhost:3939/api/inngest --no-discovery"
+  },
+  "dependencies": {
+    "@composio/core": "^0.2.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "ai": "^5.0.0",
+    "chokidar": "^4.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "inngest": "^4.4.0",
+    "zod": "^3.25.0"
+  }
+}
